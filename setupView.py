@@ -1,5 +1,5 @@
 from PySide6 import QtCore, QtWidgets
-from proceederTypes import ProceederKey
+from proceederTypes import ProceederKey, Coordinates, Settings
 
 class SetupView(QtWidgets.QWidget):
     def __init__(self):
@@ -13,6 +13,17 @@ class SetupView(QtWidgets.QWidget):
         self.__defineWidgets__()
         self.__setupConnections__()
         self.__setupLayouts__()
+
+    def getSettings(self):
+        settings = Settings()
+        settings.count = self.screenshotCount.value()
+        settings.delay_s = self.screenshotDelay_s.value()
+        settings.proceederKey = self.proceederKeyComboBox.currentData()
+        settings.startCoords = Coordinates()  # TODO set
+        settings.endCoords = Coordinates()    # TODO set
+        settings.folder = self.selectedFolderLabel.text()
+        
+        # TODO validation
 
     def __defineWidgets__(self):
         self.screenshotCountLabel = "Number of screenshots: "
@@ -113,7 +124,8 @@ class SetupView(QtWidgets.QWidget):
 
     def __setupProceederKey__():
         proceederKeyComboBox = QtWidgets.QComboBox()
-        proceederKeyComboBox.addItems([k.name for k in ProceederKey])
+        for k in ProceederKey:
+            proceederKeyComboBox.addItem(k.name, k)
         return proceederKeyComboBox
 
     def __getGuideStrings__():
