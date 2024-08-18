@@ -1,12 +1,17 @@
 from PySide6 import QtCore, QtWidgets
+from proceederTypes import ProceederKey
 
-class StarterView(QtWidgets.QWidget):
+class SetupView(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
 
         # Setup GUI widgets for configuring the taking of screenshots
-        self.screenshotCount = StarterView.__setupScreenshotCount__()
-        self.screenshotDelay_s = StarterView.__setupScreenshotDelay__()
+        self.screenshotCountLabel = "Number of screenshots: "
+        self.screenshotCount = SetupView.__setupScreenshotCount__()
+        self.screenshotDelayLabel = "Delay (s): "
+        self.screenshotDelay_s = SetupView.__setupScreenshotDelay__()
+        self.selectProceederLabel = "Proceeder Key: "
+        self.proceederKeyComboBox = SetupView.__setupProceederKey__()
 
         self.selectAreaButton = QtWidgets.QPushButton("Select Area")
         self.selectedAreaLabel = QtWidgets.QLabel("[0,0] to [1920, 1080]")   # TODO get full screen resolution
@@ -14,7 +19,7 @@ class StarterView(QtWidgets.QWidget):
         self.selectFolderButton = QtWidgets.QPushButton("Select Screenshot Folder")
         self.selectedFolderLabel = QtWidgets.QLabel("")  # TODO wrap to fit
 
-        guideStrings = StarterView.__getGuideStrings__()
+        guideStrings = SetupView.__getGuideStrings__()
         self.guideLabels = [QtWidgets.QLabel(st) for st in guideStrings]
         self.startButton = QtWidgets.QPushButton("Start")
         self.cancelButton = QtWidgets.QPushButton("Cancel")
@@ -29,8 +34,9 @@ class StarterView(QtWidgets.QWidget):
         self.mainLayout.addLayout(self.topLayout)
         self.mainLayout.addLayout(self.bottomLayout)
 
-        self.topLayout.addRow("Number of screenshots: ", self.screenshotCount)
-        self.topLayout.addRow("Delay (s): ", self.screenshotDelay_s)
+        self.topLayout.addRow(self.screenshotCountLabel, self.screenshotCount)
+        self.topLayout.addRow(self.screenshotDelayLabel, self.screenshotDelay_s)
+        self.topLayout.addRow(self.selectProceederLabel, self.proceederKeyComboBox)
         
         self.bottomLayout.addWidget(self.selectFolderButton, 0, 0)
         self.bottomLayout.addWidget(self.selectedFolderLabel, 0, 1)
@@ -46,7 +52,7 @@ class StarterView(QtWidgets.QWidget):
     def __selectScreenshotFolder__(self):
         self.selectedFolder = QtWidgets.QFileDialog.getExistingDirectory(self, 
                                        "Open Directory",
-                                       "/home",
+                                       "/home", # TODO Probably wont work on Windows
                                        QtWidgets.QFileDialog.ShowDirsOnly
                                     |  QtWidgets.QFileDialog.DontResolveSymlinks)
         self.selectedFolderLabel.setText(str(self.selectedFolder))
@@ -68,6 +74,11 @@ class StarterView(QtWidgets.QWidget):
         screenshotDelay_s.setMaximum(3600)
         return screenshotDelay_s
 
+    def __setupProceederKey__():
+        proceederKeyComboBox = QtWidgets.QComboBox()
+        proceederKeyComboBox.addItems([k.name for k in ProceederKey])
+        return proceederKeyComboBox
+
     def __getGuideStrings__():
         guideStrings = []
         guideStrings.append("")
@@ -83,7 +94,7 @@ class StarterView(QtWidgets.QWidget):
 # /delay between screenshot
 
 # /path selector to select where to save file
-# text box to specify filename
-# key to proceed the application
+# (not mvp) text box to specify filename
+# /key to proceed the application
 # /key to start selecting area
 # /add button to start / cancel

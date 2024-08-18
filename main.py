@@ -19,12 +19,12 @@
 # (optional) combine into PDF?
 
 from PySide6 import QtWidgets
-from StarterView import StarterView
+from setupView import SetupView
 import sys
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication([])
-    starterView = StarterView()
-    starterView.show()
+    setupView = SetupView()
+    setupView.show()
 
     sys.exit(app.exec())
