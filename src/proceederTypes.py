@@ -1,4 +1,5 @@
 from enum import Enum
+from PySide6.QtCore import QPoint
 
 class ProceederKey(Enum):
     # TODO use actual key id required by the library.
@@ -15,26 +16,14 @@ class ProceederKey(Enum):
     HOME  = 10,
     END   = 11
 
-class Coordinates():
-    def __init__(self):
-        self.x = -1
-        self.y = -1
-
-    def set(self, x, y):
-        self.x = x
-        self.y = y
-
-    def __str__(self):
-        return "({},{})".format(self.x, self.y)
-
 class Settings():
     def __init__(self):
         self.count = 0
         self.delay_s = 0
         self.proceederKey = ProceederKey.NONE
 
-        self.startCoords = Coordinates()
-        self.endCoords = Coordinates()
+        self.startCoords = QPoint()
+        self.endCoords = QPoint()
 
         self.folder = ""
 
@@ -43,7 +32,11 @@ class Settings():
             "count: {}".format(self.count),
             "delay (s): {}".format(self.delay_s),
             "proceederKey: {}".format(self.proceederKey.name),
-            "Coords: {} to {}".format(self.startCoords, self.endCoords),
+            "Coords: ({}, {}) to ({}, {})".format(
+                self.startCoords.x(), 
+                self.startCoords.y(), 
+                self.endCoords.x(),
+                self.endCoords.y()),
             "folder: {}".format(self.folder) 
         ]
 

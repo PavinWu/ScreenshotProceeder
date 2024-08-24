@@ -1,5 +1,7 @@
 from PySide6 import QtCore, QtWidgets
-from proceederTypes import ProceederKey, Coordinates, Settings
+from proceederTypes import ProceederKey, Settings
+
+QPoint = QtCore.QPoint
 
 class SetupView(QtWidgets.QWidget):
     def __init__(self):
@@ -19,8 +21,8 @@ class SetupView(QtWidgets.QWidget):
         settings.count = self.screenshotCount.value()
         settings.delay_s = self.screenshotDelay_s.value()
         settings.proceederKey = self.proceederKeyComboBox.currentData()
-        settings.startCoords = Coordinates()  # TODO set
-        settings.endCoords = Coordinates()    # TODO set
+        settings.startCoords = QPoint()
+        settings.endCoords = QPoint()
         settings.folder = self.selectedFolderLabel.text()
         
         # TODO validation

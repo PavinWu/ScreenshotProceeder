@@ -19,12 +19,23 @@
 # (optional) combine into PDF?
 
 from PySide6 import QtWidgets
-from setupView import SetupView
 import sys
+
+from setupView import SetupView
+from areaSelector import *
+from screenShooter import *
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication([])
-    setupView = SetupView()
-    setupView.show()
+    
+    # TODO uncomment
+    # setupView = SetupView()
+    # setupView.show()
+
+    screenShooter = ScreenShooter()
+    selector = AreaSelector(screenShooter)
+    start, end = selector.getCoords()
+    print(start)
+    print(end)
 
     sys.exit(app.exec())
