@@ -28,14 +28,7 @@ from screenShooter import *
 if __name__ == "__main__":
     app = QtWidgets.QApplication([])
     
-    # TODO uncomment
-    # setupView = SetupView()
-    # setupView.show()
-
-    screenShooter = ScreenShooter()
-    selector = AreaSelector(screenShooter)
-    start, end = selector.getCoords()
-    print(start)
-    print(end)
+    setupView = SetupView()
+    setupView.show()
 
     sys.exit(app.exec())

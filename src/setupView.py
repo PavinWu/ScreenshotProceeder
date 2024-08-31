@@ -1,5 +1,7 @@
 from PySide6 import QtCore, QtWidgets
 from proceederTypes import ProceederKey, Settings
+from areaSelector import AreaSelector
+from screenShooter import ScreenShooter
 
 QPoint = QtCore.QPoint
 
@@ -10,6 +12,8 @@ class SetupView(QtWidgets.QWidget):
         # instance variables
         self.setupWidgetList = []
         self.cancelWidgetList = []
+        self.screenShooter = ScreenShooter()
+        self.areaSelector = AreaSelector(self.screenShooter)
 
         # setup
         self.__defineWidgets__()
@@ -48,6 +52,7 @@ class SetupView(QtWidgets.QWidget):
 
     def __setupConnections__(self):
         self.selectFolderButton.clicked.connect(self.__selectScreenshotFolder__)
+        self.selectAreaButton.clicked.connect(self.__selectArea__)
         self.startButton.clicked.connect(self.__start__)
         self.cancelButton.clicked.connect(self.__cancel__)
 
@@ -107,6 +112,10 @@ class SetupView(QtWidgets.QWidget):
         for widget in self.cancelWidgetList:
             widget.setEnabled(False)
 
+    @QtCore.Slot()
+    def __selectArea__(self):
+        return self.areaSelector.getCoords()
+
     def __setupScreenshotCount__():
         defaultScreenshotCount = 1
 
@@ -137,7 +146,6 @@ class SetupView(QtWidgets.QWidget):
         guideStrings.append("Select the application you want to proceed before the countdown ends")
         guideStrings.append("After starting, press TODO to stop taking screenshot")
         return guideStrings
-
 
 # get view
 

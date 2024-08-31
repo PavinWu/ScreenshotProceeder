@@ -11,17 +11,18 @@ class ScreenShooter(QtWidgets.QWidget):
         # TODO refactor so we reuse some parts for non-whole screen screen grabing
 
         if platform.system() == "Linux":
-            print("Linux detected. Note: only KDE is supported.")
-            # arguments = QtCore.QStringList()
-            # arguments << "-"
+            backgroundPicPath = "/tmp/screenshot_proceeder_screenbg.jpg"
+            print("Linux detected. Note: require Spectacle to work.")
 
-            grimProcess = QtCore.QProcess()
-            print("starting grim")
-            grimProcess.start(program, ["-"])
-            if (grimProcess.waitForFinished()):
-                print("grim finished")
+            process = QtCore.QProcess()
+            print("starting spectacle")
+            process.start("spectacle", ["-b", "-o", backgroundPicPath])
+            if (process.waitForFinished()):
+                print("execution finished")
+
                 pixmap = QtGui.QPixmap()
-                pixmap.loadFromData(grimProcess.readAll())
+                pixmap.load(backgroundPicPath)
+                return pixmap
             else:
                 # TODO better error handling
                 raise RuntimeError("The universal wayland screen capture adapter requires Grim as " +

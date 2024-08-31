@@ -15,11 +15,14 @@ class AreaSelector(QtWidgets.QWidget):
         self.screenShooter = ScreenShooter()
 
         # Don't pass parent to have rubber band be top level.
-        self.rubberBand = QtWidgets.QRubberBand(QtWidgets.QRubberBand.Rectangle, self)
 
+    # TODO mouse event not registered for non-main window???
+    # Apparently, these mouse events require main window by default ...
     def mousePressEvent(self, event):
         self.beginCoords = event.pos()
         # TODO normalize coords here?
+        print("Drawing start coord at {}, {}", self.beginCoords.x, self.beginCoords.y)
+        self.rubberBand = QtWidgets.QRubberBand(QtWidgets.QRubberBand.Rectangle, self)
         self.rubberBand.setGeometry(QRect(self.beginCoords, QtCore.QSize()))
         self.rubberBand.show()
 
@@ -33,17 +36,14 @@ class AreaSelector(QtWidgets.QWidget):
 
     def getCoords(self):
         pixmap = self.screenShooter.getWholeScreen()
-        pixmap.save("pixmap.jpg")
+        self.setEnabled(True)
         screenshotLabel = self.__showPixmapFullScreen__(pixmap)
 
-        # self.setEnabled(True)
 
         # Looks like we need to create an overlay first.
 
         # self.areaSelectedSem.acquire()       
         # self.setEnabled(False)
-
-        # TODO With this, ended up not showing anything??
         # self.__hidePixmapFullscreen__(screenshotLabel)
 
         return self.beginCoords, self.endCoords
@@ -51,13 +51,20 @@ class AreaSelector(QtWidgets.QWidget):
     def __showPixmapFullScreen__(self, pixmap):
 
         screenshotLabel = QtWidgets.QLabel(self)
-        # TODO uncomment
+
+        print("Label size: {} x {}", screenshotLabel.width(), screenshotLabel.height())
+        screen = QtGui.QGuiApplication.primaryScreen()
+        # TODO incorrect screen size when using external screen
+        print("Screen size: {} x {}", screen.geometry().width(), screen.geometry().height())
+        
         screenshotLabel.setWindowFlags(QtCore.Qt.Window | QtCore.Qt.FramelessWindowHint | QtCore.Qt.WindowStaysOnTopHint)
         screenshotLabel.setAlignment(QtCore.Qt.AlignCenter)
-        screenshotLabel.setPixmap(pixmap.scaled(
-                screenshotLabel.size(),
-                QtCore.Qt.KeepAspectRatio,
-                QtCore.Qt.SmoothTransformation))
+        # TODO set qlabel size to screen size.
+        # screenshotLabel.setPixmap(pixmap.scaled(
+        #         screenshotLabel.size(),
+        #         QtCore.Qt.KeepAspectRatio,
+        #         QtCore.Qt.SmoothTransformation))
+        screenshotLabel.setPixmap(pixmap)
         screenshotLabel.showFullScreen()
 
         return screenshotLabel
