@@ -16,7 +16,7 @@ class ScreenShooter(QtWidgets.QWidget):
 
             process = QtCore.QProcess()
             print("starting spectacle")
-            process.start("spectacle", ["-b", "-o", backgroundPicPath])
+            process.start("spectacle", ["-b", "-n", "-o", backgroundPicPath])
             if (process.waitForFinished()):
                 print("execution finished")
 

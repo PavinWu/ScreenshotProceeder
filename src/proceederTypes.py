@@ -1,5 +1,5 @@
 from enum import Enum
-from PySide6.QtCore import QPoint
+from PySide6.QtCore import QPoint, Signal, QObject
 
 class ProceederKey(Enum):
     # TODO use actual key id required by the library.
@@ -22,7 +22,7 @@ class Settings():
         self.delay_s = 0
         self.proceederKey = ProceederKey.NONE
 
-        self.startCoords = QPoint()
+        self.beginCoords = QPoint()
         self.endCoords = QPoint()
 
         self.folder = ""
@@ -33,11 +33,18 @@ class Settings():
             "delay (s): {}".format(self.delay_s),
             "proceederKey: {}".format(self.proceederKey.name),
             "Coords: ({}, {}) to ({}, {})".format(
-                self.startCoords.x(), 
-                self.startCoords.y(), 
+                self.beginCoords.x(), 
+                self.beginCoords.y(), 
                 self.endCoords.x(),
                 self.endCoords.y()),
             "folder: {}".format(self.folder) 
         ]
 
         return '\n'.join(settingsStrList)
+
+class Boundary():
+    begin = QPoint()
+    end = QPoint()
+
+class CommunicateBoundary(QObject):
+    signal = Signal(Boundary)

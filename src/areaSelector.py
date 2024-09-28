@@ -1,6 +1,7 @@
 from PySide6 import QtCore, QtWidgets, QtGui
 import threading
 from screenShooter import *
+from proceederTypes import *
 
 QRect = QtCore.QRect
 
@@ -12,6 +13,8 @@ class AreaSelector(QtWidgets.QWidget):
         self.beginCoords = QRect()
         self.endCoords = QRect()
         self.screenShooter = ScreenShooter()
+        self.sideRatio = 1
+        self.commBoundary = CommunicateBoundary()
 
         self.screenshotLabel = QtWidgets.QLabel(self)
         self.layout = QtWidgets.QStackedLayout(self)
@@ -22,7 +25,7 @@ class AreaSelector(QtWidgets.QWidget):
     def mousePressEvent(self, event):
         self.beginCoords = event.pos()
         # TODO normalize coords here?
-        print("Drawing start coord at {}, {}", self.beginCoords.x, self.beginCoords.y)
+        print("Drawing begin coord at {}, {}", self.beginCoords.x, self.beginCoords.y)
         self.rubberBand = QtWidgets.QRubberBand(QtWidgets.QRubberBand.Rectangle, self)
         self.rubberBand.setGeometry(QRect(self.beginCoords, QtCore.QSize()))
         self.rubberBand.show()
@@ -35,20 +38,33 @@ class AreaSelector(QtWidgets.QWidget):
         self.rubberBand.hide()
         self.__hidePixmapFullscreen__()
 
-    def getCoords(self):
+        boundary = Boundary()
+        boundary.begin = self.beginCoords
+        boundary.end = self.endCoords
+        self.commBoundary.signal.emit(boundary) # TODO test passing int for now
+        # TODO This works if user doesn't come back to the main screen/
+        # TODO disconnect
+
+    def selectCoords(self, getCoordsCallback):
+        # Can do this!: https://stackoverflow.com/questions/37252756/simplest-way-for-pyqt-threading
+        # https://doc.qt.io/qtforpython-6/tutorials/basictutorial/signals_and_slots.html#signals-and-slots
+        # Note: in all these cases, the signal is NOT the signal object. It's created inside a QObject, and use the name in there.
         pixmap = self.screenShooter.getWholeScreen()
-        self.screenshotLabel = self.__showPixmapFullScreen__(pixmap)
-        return self.beginCoords, self.endCoords
+        self.__showPixmapFullScreen__(pixmap)
+        self.commBoundary.signal.connect(getCoordsCallback)
 
     def __showPixmapFullScreen__(self, pixmap):
-        # TODO remove
-        print("Label size: {} x {}", self.screenshotLabel.width(), self.screenshotLabel.height())
         screen = QtGui.QGuiApplication.primaryScreen()
-        # TODO remove. incorrect screen size?
-        print("Screen size: {} x {}", screen.geometry().width(), screen.geometry().height())
 
+        # Screen size may be different to actual pixel dimensions if using HiDPI screen.
+        # See https://doc.qt.io/qt-6/highdpi.html
+        print("Screen size: {} x {}", screen.geometry().width(), screen.geometry().height())
+        print("Pixmap size: {} x {}", pixmap.width(), pixmap.height())
+        print("Side ratio = {}", pixmap.width())
+
+        # TODO centre pixmap? (seems to be a bit off?)
         self.screenshotLabel.setPixmap(pixmap.scaled(
-                self.screenshotLabel.size(),
+                screen.size(),
                 QtCore.Qt.KeepAspectRatio,
                 QtCore.Qt.SmoothTransformation))
         self.show()

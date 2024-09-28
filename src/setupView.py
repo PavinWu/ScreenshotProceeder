@@ -1,7 +1,7 @@
 from PySide6 import QtCore, QtWidgets
-from proceederTypes import ProceederKey, Settings
 from areaSelector import AreaSelector
 from screenShooter import ScreenShooter
+from proceederTypes import *
 
 QPoint = QtCore.QPoint
 
@@ -14,6 +14,7 @@ class SetupView(QtWidgets.QWidget):
         self.cancelWidgetList = []
         self.screenShooter = ScreenShooter()
         self.areaSelector = AreaSelector(self.screenShooter)
+        self.boundary = Boundary()
 
         # setup
         self.__defineWidgets__()
@@ -25,7 +26,7 @@ class SetupView(QtWidgets.QWidget):
         settings.count = self.screenshotCount.value()
         settings.delay_s = self.screenshotDelay_s.value()
         settings.proceederKey = self.proceederKeyComboBox.currentData()
-        settings.startCoords = QPoint()
+        settings.beginCoords = QPoint()
         settings.endCoords = QPoint()
         settings.folder = self.selectedFolderLabel.text()
         
@@ -114,7 +115,14 @@ class SetupView(QtWidgets.QWidget):
 
     @QtCore.Slot()
     def __selectArea__(self):
-        return self.areaSelector.getCoords()
+        self.areaSelector.selectCoords(self.__getSelectArea__)
+
+    @QtCore.Slot(Boundary)
+    def __getSelectArea__(self, boundary):
+        self.boundary = boundary
+        print("Begin {}\nEnd {}", boundary.begin, boundary.end)
+        self.selectedAreaLabel.setText("{} to {}".format(boundary.begin, boundary.end))
+
 
     def __setupScreenshotCount__():
         defaultScreenshotCount = 1
