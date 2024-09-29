@@ -51,7 +51,7 @@ class AreaSelector(QtWidgets.QWidget):
         # Note: in all these cases, the signal is NOT the signal object. It's created inside a QObject, and use the name in there.
         pixmap = self.screenShooter.getWholeScreen()
         self.__showPixmapFullScreen__(pixmap)
-        self.commBoundary.signal.connect(getCoordsCallback)
+        self.commBoundary.signal.connect(getCoordsCallback) # TODO no need to connect again if already connected?
 
     def __showPixmapFullScreen__(self, pixmap):
         screen = QtGui.QGuiApplication.primaryScreen()

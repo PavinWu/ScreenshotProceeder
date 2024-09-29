@@ -2,6 +2,7 @@ from PySide6 import QtCore, QtWidgets
 from areaSelector import AreaSelector
 from screenShooter import ScreenShooter
 from proceederTypes import *
+import time
 
 QPoint = QtCore.QPoint
 
@@ -99,30 +100,44 @@ class SetupView(QtWidgets.QWidget):
 
     @QtCore.Slot()
     def __start__(self):
-        for widget in self.setupWidgetList:
-            widget.setEnabled(False)
-        for widget in self.cancelWidgetList:
-            widget.setEnabled(True)
+        self.__setWidgetEnableStateForCancel__()
 
         # TODO perform start action
 
     @QtCore.Slot()
     def __cancel__(self):
-        for widget in self.setupWidgetList:
-            widget.setEnabled(True)
-        for widget in self.cancelWidgetList:
-            widget.setEnabled(False)
+        self.__setWidgetEnableStateForSetup__()
+
+        # TODO perform cancel action
 
     @QtCore.Slot()
     def __selectArea__(self):
-        self.areaSelector.selectCoords(self.__getSelectArea__)
+        self.__hideMainWindow__()   # TODO somehow hiding only activates when the method exits
+        time.sleep(2)
+        # self.areaSelector.selectCoords(self.__getSelectArea__)
 
     @QtCore.Slot(Boundary)
     def __getSelectArea__(self, boundary):
         self.boundary = boundary
-        print("Begin {}\nEnd {}", boundary.begin, boundary.end)
-        self.selectedAreaLabel.setText("{} to {}".format(boundary.begin, boundary.end))
+        self.selectedAreaLabel.setText("[{}, {}] to [{}, {}]".format(
+            boundary.begin.x(), boundary.begin.y(), boundary.end.x(), boundary.end.y()))
+        self.__setWidgetEnableStateForSetup__()
 
+    def __setWidgetEnableStateForSetup__(self):
+        for widget in self.setupWidgetList:
+            widget.setEnabled(True)
+        for widget in self.cancelWidgetList:
+            widget.setEnabled(False)
+        self.show()
+
+    def __setWidgetEnableStateForCancel__(self):
+        for widget in self.setupWidgetList:
+            widget.setEnabled(False)
+        for widget in self.cancelWidgetList:
+            widget.setEnabled(True)
+
+    def __hideMainWindow__(self):
+        self.hide()
 
     def __setupScreenshotCount__():
         defaultScreenshotCount = 1
