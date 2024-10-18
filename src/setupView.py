@@ -112,9 +112,23 @@ class SetupView(QtWidgets.QWidget):
 
     @QtCore.Slot()
     def __selectArea__(self):
-        self.__hideMainWindow__()   # TODO somehow hiding only activates when the method exits
-        time.sleep(2)
-        # self.areaSelector.selectCoords(self.__getSelectArea__)
+        self.__hideMainWindow__()
+
+        # Defer execution until the Qt thread gets to update things in its update queue (after return of function).
+        # Otherwise the function called will be executed first.
+        ## obj, name of slot, connection type
+        QtCore.QMetaObject.invokeMethod(self, "__callSelectCoords__", QtCore.Qt.QueuedConnection)
+
+        # No error, but not hide
+        # QtCore.QMetaObject.invokeMethod(self, "__callSelectCoords__", QtCore.Qt.AutoConnection)
+        
+        # Not work
+        ## QtCore.QMetaObject.invokeMethod(self, areaSelector.selectCoords, self.__getSelectArea__)
+        ## QtCore.QMetaObject.invokeMethod(self.areaSelector, selectCoords, self.__getSelectArea__)
+
+    @QtCore.Slot()
+    def __callSelectCoords__(self):
+        self.areaSelector.selectCoords(self.__getSelectArea__)
 
     @QtCore.Slot(Boundary)
     def __getSelectArea__(self, boundary):
@@ -137,6 +151,16 @@ class SetupView(QtWidgets.QWidget):
             widget.setEnabled(True)
 
     def __hideMainWindow__(self):
+        # Tried:
+        # - self.hide()
+        # TODO somehow hiding only activates when the method exits .... turns out you have to move mouse before it hides ... what???
+        # - resize to 0: no change.
+        # - show minimized
+        # - hide then sleep then show doesn't fix it...
+        # What if you start a nwe thread? (so that hide window is the last thing?)
+        # https://forum.qt.io/topic/145801/treeview-only-updates-when-mouse-is-moved-over-it/2  ?
+        # Actually you could type something, not have to be mouse.
+        # https://stackoverflow.com/questions/25544652/qt-widget-element-doesnt-want-to-hide
         self.hide()
 
     def __setupScreenshotCount__():
