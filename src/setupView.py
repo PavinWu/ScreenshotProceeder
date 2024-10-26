@@ -1,6 +1,7 @@
 from PySide6 import QtCore, QtWidgets
 from areaSelector import AreaSelector
 from screenShooter import ScreenShooter
+from keyActuator import KeyActuator
 from proceederTypes import *
 import time
 
@@ -13,7 +14,8 @@ class SetupView(QtWidgets.QWidget):
         # instance variables
         self.setupWidgetList = []
         self.cancelWidgetList = []
-        self.screenShooter = ScreenShooter()
+        self.keyActuator = KeyActuator()
+        self.screenShooter = ScreenShooter(self.keyActuator)
         self.areaSelector = AreaSelector(self.screenShooter)
         self.boundary = Boundary()
 
@@ -21,6 +23,8 @@ class SetupView(QtWidgets.QWidget):
         self.__defineWidgets__()
         self.__setupConnections__()
         self.__setupLayouts__()
+
+        # TODO restrict size
 
     def getSettings(self):
         settings = Settings()
@@ -101,6 +105,8 @@ class SetupView(QtWidgets.QWidget):
     @QtCore.Slot()
     def __start__(self):
         self.__setWidgetEnableStateForCancel__()
+
+        
 
         # TODO perform start action
 

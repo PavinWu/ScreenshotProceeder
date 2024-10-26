@@ -41,6 +41,7 @@ class AreaSelector(QtWidgets.QWidget):
         boundary = Boundary()
         boundary.begin = self.beginCoords
         boundary.end = self.endCoords
+        # TODO HiDPI scaling
         self.commBoundary.signal.emit(boundary) # TODO test passing int for now
         # TODO This works if user doesn't come back to the main screen/
         # TODO disconnect
@@ -49,7 +50,7 @@ class AreaSelector(QtWidgets.QWidget):
         # Can do this!: https://stackoverflow.com/questions/37252756/simplest-way-for-pyqt-threading
         # https://doc.qt.io/qtforpython-6/tutorials/basictutorial/signals_and_slots.html#signals-and-slots
         # Note: in all these cases, the signal is NOT the signal object. It's created inside a QObject, and use the name in there.
-        pixmap = self.screenShooter.getWholeScreen()
+        pixmap = self.screenShooter.getTempWholeScreen()
         self.__showPixmapFullScreen__(pixmap)
         self.commBoundary.signal.connect(getCoordsCallback) # TODO no need to connect again if already connected?
 
@@ -62,6 +63,7 @@ class AreaSelector(QtWidgets.QWidget):
         print("Pixmap size: {} x {}", pixmap.width(), pixmap.height())
         print("Side ratio = {}", pixmap.width())
 
+        # TODO pass 
         # TODO centre pixmap? (seems to be a bit off?)
         self.screenshotLabel.setPixmap(pixmap.scaled(
                 screen.size(),
