@@ -41,7 +41,7 @@ class ScreenShooter(QtWidgets.QWidget):
         # TODO non-Wayland Linux and other platforms
         # else:
         #     screen = QtGui.QGuiApplication.primaryScreen()
-        #     window = self.windowHandle()
+        #     window = self.windowHandle()  
         #     if window:
         #         screen = window.screen()
         #     if not screen:
@@ -51,4 +51,5 @@ class ScreenShooter(QtWidgets.QWidget):
         return pixmap
 
     def getRepeatCroppedScreen(self, picPath, rect, key, dur):
-        pass
+        pass                                                                                 
+
