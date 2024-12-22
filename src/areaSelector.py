@@ -10,8 +10,8 @@ class AreaSelector(QtWidgets.QWidget):
         super().__init__()
 
         # Note that begin coords may be less or greater than end.
-        self.beginCoords = QRect()
-        self.endCoords = QRect()
+        self.beginCoords = None
+        self.endCoords = None
         self.screenShooter = screenShooter
         self.hdpiScaling = 1
         self.commBoundary = CommunicateBoundary()
@@ -38,9 +38,24 @@ class AreaSelector(QtWidgets.QWidget):
         self.rubberBand.hide()
         self.__hidePixmapFullscreen__()
 
-        boundary = Boundary()
-        boundary.begin = self.beginCoords * self.hdpiScaling
-        boundary.end = self.endCoords * self.hdpiScaling
+        boundary = Boundary() 
+        boundary.begin = self.beginCoords
+        boundary.end = self.endCoords
+
+        # Make begin coords top left, and end coords bottom right
+        if boundary.begin.x() > boundary.end.x():
+            boundary.begin = QPoint(self.endCoords.x(), boundary.begin.y())
+            boundary.end = QPoint(self.beginCoords.x(), boundary.end.y())
+            print(boundary.begin, boundary.end)
+
+        if boundary.begin.y() > boundary.end.y():
+            boundary.begin = QPoint(boundary.begin.x(), self.endCoords.y())
+            boundary.end = QPoint(boundary.end.x(), self.beginCoords.y())
+            print(boundary.begin, boundary.end)
+        
+        boundary.begin *= self.hdpiScaling
+        boundary.end *= self.hdpiScaling
+        
         self.commBoundary.signal.emit(boundary)
 
         # Disconnect. See https://doc.qt.io/qt-6/signalsandslots.html
@@ -53,7 +68,7 @@ class AreaSelector(QtWidgets.QWidget):
         # Note: in all these cases, the signal is NOT the signal object. It's created inside a QObject, and use the name in there.
         pixmap = self.screenShooter.getTempWholeScreen()
         self.__showPixmapFullScreen__(pixmap)
-        self.commBoundary.signal.connect(getCoordsCallback) # TODO no need to connect again if already connected?
+        self.commBoundary.signal.connect(getCoordsCallback)
 
     def __showPixmapFullScreen__(self, pixmap):
         screen = QtGui.QGuiApplication.primaryScreen()

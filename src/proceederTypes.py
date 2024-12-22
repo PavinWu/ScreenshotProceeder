@@ -2,19 +2,13 @@ from enum import Enum
 from PySide6.QtCore import QPoint, Signal, QObject
 
 class ProceederKey(Enum):
-    # TODO use actual key id required by the library.
     NONE  = 0,
     SPACE = 1, 
     ENTER = 2,
     RIGHT = 3,
     LEFT  = 4,
     DOWN  = 5,
-    UP    = 6,
-    TAB   = 7,
-    PAGE_DOWN = 8,
-    PAGE_UP   = 9,
-    HOME  = 10,
-    END   = 11
+    UP    = 6
 
 class Settings():
     def __init__(self):
