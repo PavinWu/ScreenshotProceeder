@@ -134,6 +134,7 @@ class SetupView(QtWidgets.QWidget):
 
     @QtCore.Slot()
     def __callSelectCoords__(self):
+        time.sleep(0.5)     # Allow time for animation to complete
         self.areaSelector.selectCoords(self.__getSelectArea__)
 
     @QtCore.Slot(Boundary)

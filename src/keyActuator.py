@@ -1,5 +1,5 @@
 # import keyboard   # unmaintained!
-import pynput
+#import pynput
 
 class KeyActuator:
     # pynput seems to detect only after you have pressed a modifier key! (ctrl/alt/shift/key.cmd (win))

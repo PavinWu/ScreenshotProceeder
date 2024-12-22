@@ -12,8 +12,8 @@ class AreaSelector(QtWidgets.QWidget):
         # Note that begin coords may be less or greater than end.
         self.beginCoords = QRect()
         self.endCoords = QRect()
-        self.screenShooter = ScreenShooter()
-        self.sideRatio = 1
+        self.screenShooter = screenShooter
+        self.hdpiScaling = 1
         self.commBoundary = CommunicateBoundary()
 
         self.screenshotLabel = QtWidgets.QLabel(self)
@@ -39,12 +39,13 @@ class AreaSelector(QtWidgets.QWidget):
         self.__hidePixmapFullscreen__()
 
         boundary = Boundary()
-        boundary.begin = self.beginCoords
-        boundary.end = self.endCoords
-        # TODO HiDPI scaling
-        self.commBoundary.signal.emit(boundary) # TODO test passing int for now
-        # TODO This works if user doesn't come back to the main screen/
-        # TODO disconnect
+        boundary.begin = self.beginCoords * self.hdpiScaling
+        boundary.end = self.endCoords * self.hdpiScaling
+        self.commBoundary.signal.emit(boundary)
+
+        # Disconnect. See https://doc.qt.io/qt-6/signalsandslots.html
+        # TODO try catch somehow?
+        self.commBoundary.signal.disconnect()
 
     def selectCoords(self, getCoordsCallback):
         # Can do this!: https://stackoverflow.com/questions/37252756/simplest-way-for-pyqt-threading
@@ -61,15 +62,15 @@ class AreaSelector(QtWidgets.QWidget):
         # See https://doc.qt.io/qt-6/highdpi.html
         print("Screen size: {} x {}", screen.geometry().width(), screen.geometry().height())
         print("Pixmap size: {} x {}", pixmap.width(), pixmap.height())
-        print("Side ratio = {}", pixmap.width())
 
-        # TODO pass 
-        # TODO centre pixmap? (seems to be a bit off?)
+        # Assuming pixmap gives the real screen resolution, and screen gives the 'appearance' resolution. 
+        self.hdpiScaling = pixmap.width() / screen.geometry().width()
+
         self.screenshotLabel.setPixmap(pixmap.scaled(
                 screen.size(),
                 QtCore.Qt.KeepAspectRatio,
                 QtCore.Qt.SmoothTransformation))
-        self.show()
+        self.showFullScreen()
 
     def __hidePixmapFullscreen__(self):
         self.hide()

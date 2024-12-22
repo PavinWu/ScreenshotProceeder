@@ -7,25 +7,27 @@ class ScreenShooter(QtWidgets.QWidget):
         self.keyActuator = keyActuator
 
     def getTempWholeScreen(self):
-        return getWholeScreen("/tmp/screenshot_proceeder_screenbg.jpg")
+        return self.getWholeScreen("/tmp/screenshot_proceeder_screenbg.jpg")
 
     def getCroppedScreen(self, picPath, rect):
-        pixmap = getWholeScreen(picPath)
+        pixmap = self.getWholeScreen(picPath)
         return pixmap.copy(rect)
 
     def getWholeScreen(self, picPath):
         # Note: The Qt's screen grabber doesn't work on Wayland. Assume Linux is using Wayland.
         # https://bugreports.qt.io/browse/QTBUG-34976?focusedCommentId=276038&page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel
         # 
-        # Use Spectacle instead.
+        # Use gnome-screenshot instead.
         # TODO refactor so we reuse some parts for non-whole screen screen grabing
 
+        scTool = 'gnome-screenshot'
+
         if platform.system() == "Linux":
-            print("Linux detected. Note: require Spectacle to work.")
+            print("Linux detected. Note: require '{}' to work.".format(scTool))
 
             process = QtCore.QProcess()
-            print("starting spectacle")
-            process.start("spectacle", ["-b", "-m", "-n", "-o", picPath])
+            print("starting {}".format(scTool))
+            process.start("{}".format(scTool), ["-f", picPath])
             if (process.waitForFinished()):
                 print("execution finished")
 
@@ -52,4 +54,5 @@ class ScreenShooter(QtWidgets.QWidget):
 
     def getRepeatCroppedScreen(self, picPath, rect, key, dur):
         pass                                                                                 
+
 
