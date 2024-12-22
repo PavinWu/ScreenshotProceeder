@@ -1,19 +1,14 @@
 from PySide6 import QtCore, QtWidgets, QtGui
 import platform
+import os
 
 class ScreenShooter(QtWidgets.QWidget):
     def __init__(self, keyActuator):
         super().__init__()
         self.keyActuator = keyActuator
+        self.stopRepeatScreenshot = False
 
-    def getTempWholeScreen(self):
-        return self.getWholeScreen("/tmp/screenshot_proceeder_screenbg.jpg")
-
-    def getCroppedScreen(self, picPath, rect):
-        pixmap = self.getWholeScreen(picPath)
-        return pixmap.copy(rect)
-
-    def getWholeScreen(self, picPath):
+    def getWholeScreen(self, picPath, timeDelay=0):
         # Note: The Qt's screen grabber doesn't work on Wayland. Assume Linux is using Wayland.
         # https://bugreports.qt.io/browse/QTBUG-34976?focusedCommentId=276038&page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel
         # 
@@ -27,7 +22,8 @@ class ScreenShooter(QtWidgets.QWidget):
 
             process = QtCore.QProcess()
             print("starting {}".format(scTool))
-            process.start("{}".format(scTool), ["-f", picPath])
+            print("{}".format(scTool), ["-f", picPath, "-d", timeDelay])
+            process.start("{}".format(scTool), ["-f", picPath, "-d", timeDelay])
             if (process.waitForFinished()):
                 print("execution finished")
 
@@ -52,7 +48,20 @@ class ScreenShooter(QtWidgets.QWidget):
 
         return pixmap
 
-    def getRepeatCroppedScreen(self, picPath, rect, key, dur):
-        pass                                                                                 
+    def getTempWholeScreen(self):
+        return self.getWholeScreen("/tmp/screenshot_proceeder_screenbg.jpg")
 
+    def getCroppedScreen(self, picPath, timeDelay, rect):
+        pixmap = self.getWholeScreen(picPath)
+        return pixmap.copy(rect)
 
+    def getRepeatCroppedScreen(self, picPath, timeDelay, rect, key, totCount):
+        self.stopRepeatScreenshot = False
+        for count in range(totCount):
+            if not self.stopRepeatScreenshot:
+                self.getCroppedScreen(os.path.join(picPath, "{}.jpg".format(count)), timeDelay, rect)
+                self.keyActuator.proceed(key)
+
+    def stopRepeatCroppedScreen(self):
+        # Note: NOT thread safe.
+        self.stopRepeatScreenshot = True
