@@ -7,6 +7,25 @@ import time
 
 QPoint = QtCore.QPoint
 
+class SingletonShooterForQThread(QtCore.QRunnable):        
+    def __init__(self):
+        super().__init__()
+
+    def setup(self, settings, boundary, shooter):
+        self.settings = settings
+        self.boundary = boundary
+        self.screenshooter = shooter
+
+    def run(self):
+        if (self.settings is not None) and (self.screenshooter is not None):
+            self.screenshooter.getRepeatCroppedScreen(
+                self.settings.folder, 
+                self.settings.delay_s, 
+                QtCore.QRect(self.boundary.begin, self.boundary.end),
+                self.settings.proceederKey, 
+                self.settings.count
+            )
+
 class SetupView(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
@@ -31,8 +50,6 @@ class SetupView(QtWidgets.QWidget):
         settings.count = self.screenshotCount.value()
         settings.delay_s = self.screenshotDelay_s.value()
         settings.proceederKey = self.proceederKeyComboBox.currentData()
-        settings.beginCoords = QPoint()
-        settings.endCoords = QPoint()
         settings.folder = self.selectedFolderLabel.text()
         
         # TODO validation
@@ -97,7 +114,7 @@ class SetupView(QtWidgets.QWidget):
     def __selectScreenshotFolder__(self):
         self.selectedFolder = QtWidgets.QFileDialog.getExistingDirectory(self, 
                                        "Open Directory",
-                                       "/home", # TODO Probably wont work on Windows
+                                       "/home/vinwu/Documents/test", # TODO Probably wont work on Windows. TODO update
                                        QtWidgets.QFileDialog.ShowDirsOnly
                                     |  QtWidgets.QFileDialog.DontResolveSymlinks)
         self.selectedFolderLabel.setText(str(self.selectedFolder))
@@ -106,15 +123,18 @@ class SetupView(QtWidgets.QWidget):
     def __start__(self):
         self.__setWidgetEnableStateForCancel__()
 
-        
+        # TODO minimise main window (NOT hide! - want user to be able to cancel)
+        # TODO not allow start until all OK (including box)
+        singletonShooter = SingletonShooterForQThread()
+        singletonShooter.setup(self.getSettings(), self.boundary, self.screenShooter)
+        QtCore.QThreadPool.globalInstance().start(singletonShooter)
 
-        # TODO perform start action
+        # TODO done event
 
     @QtCore.Slot()
     def __cancel__(self):
         self.__setWidgetEnableStateForSetup__()
-
-        # TODO perform cancel action
+        self.screenShooter.stopRepeatCroppedScreen()
 
     @QtCore.Slot()
     def __selectArea__(self):
@@ -198,7 +218,7 @@ class SetupView(QtWidgets.QWidget):
         guideStrings.append("")
         guideStrings.append("When starting a count down of TODO seconds will appear.")
         guideStrings.append("Select the application you want to proceed before the countdown ends")
-        guideStrings.append("After starting, press TODO to stop taking screenshot")
+        guideStrings.append("If you want to stop the process before it completes, press Cancel on this window")
         return guideStrings
 
 # get view
