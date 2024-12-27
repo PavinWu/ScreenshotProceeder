@@ -16,17 +16,24 @@ class SingletonShooterForQThread(QtCore.QRunnable):
         self.boundary = boundary
         self.screenshooter = shooter
         self.doneCallback = doneCallback
+        self.applicationSelectWait_s = 5
 
     def run(self):
-        if (self.settings is not None) and (self.screenshooter is not None):
+        if (self.settings is not None) and (self.settings.isValid()) \
+            and (self.screenshooter is not None):
+
             self.screenshooter.getRepeatCroppedScreen(
-                self.settings.folder, 
+                self.applicationSelectWait_s,
+                self.settings.folder,
                 self.settings.delay_s, 
-                QtCore.QRect(self.boundary.begin, self.boundary.end),
+                QtCore.QRect(self.settings.beginCoords, self.settings.endCoords),
                 self.settings.proceederKey, 
                 self.settings.count
             )
-            self.doneCallback()
+        else:
+            print("Settings invalid. Aborting ...")
+        
+        self.doneCallback()
 
 class SetupView(QtWidgets.QWidget):
     def __init__(self):
@@ -53,10 +60,10 @@ class SetupView(QtWidgets.QWidget):
         settings.delay_s = self.screenshotDelay_s.value()
         settings.proceederKey = self.proceederKeyComboBox.currentData()
         settings.folder = self.selectedFolderLabel.text()
+        settings.beginCoords = self.boundary.begin
+        settings.endCoords = self.boundary.end
 
         return settings
-        
-        # TODO validation
 
     def __defineWidgets__(self):
         self.screenshotCountLabel = "Number of screenshots: "
@@ -67,7 +74,7 @@ class SetupView(QtWidgets.QWidget):
         self.proceederKeyComboBox = SetupView.__setupProceederKey__()
 
         self.selectAreaButton = QtWidgets.QPushButton("Select Area")
-        self.selectedAreaLabel = QtWidgets.QLabel("[0,0] to [1920, 1080]")   # TODO get full screen resolution
+        self.selectedAreaLabel = QtWidgets.QLabel("[0, 0] to [0, 0]")
 
         self.selectFolderButton = QtWidgets.QPushButton("Select Screenshot Folder")
         self.selectedFolderLabel = QtWidgets.QLabel("")  # TODO wrap to fit
@@ -118,7 +125,7 @@ class SetupView(QtWidgets.QWidget):
     def __selectScreenshotFolder__(self):
         self.selectedFolder = QtWidgets.QFileDialog.getExistingDirectory(self, 
                                        "Open Directory",
-                                       "/home/vinwu/Documents/test", # TODO Probably wont work on Windows. TODO update
+                                       "~/", # Wont work on Windows.
                                        QtWidgets.QFileDialog.ShowDirsOnly
                                     |  QtWidgets.QFileDialog.DontResolveSymlinks)
         self.selectedFolderLabel.setText(str(self.selectedFolder))
@@ -140,7 +147,7 @@ class SetupView(QtWidgets.QWidget):
 
     @QtCore.Slot()
     def __selectArea__(self):
-        self.__hideMainWindow__()
+        self.hide()
 
         # Defer execution until the Qt thread gets to update things in its update queue (after return of function).
         # Otherwise the function called will be executed first, and GUI won't be updated at the right time.
@@ -158,10 +165,6 @@ class SetupView(QtWidgets.QWidget):
     def __callSelectCoords__(self):
         time.sleep(0.5)     # Allow time for animation to complete
         self.areaSelector.selectCoords(self.__getSelectArea__)
-
-    # @QtCore.Slot()
-    # def __startAction__(self):
-    #     self.screenShooter.getRepeatCroppedScreen()
 
     @QtCore.Slot(Boundary)
     def __getSelectArea__(self, boundary):
@@ -182,19 +185,6 @@ class SetupView(QtWidgets.QWidget):
             widget.setEnabled(False)
         for widget in self.cancelWidgetList:
             widget.setEnabled(True)
-
-    def __hideMainWindow__(self):
-        # Tried:
-        # - self.hide()
-        # TODO somehow hiding only activates when the method exits .... turns out you have to move mouse before it hides ... what???
-        # - resize to 0: no change.
-        # - show minimized
-        # - hide then sleep then show doesn't fix it...
-        # What if you start a nwe thread? (so that hide window is the last thing?)
-        # https://forum.qt.io/topic/145801/treeview-only-updates-when-mouse-is-moved-over-it/2  ?
-        # Actually you could type something, not have to be mouse.
-        # https://stackoverflow.com/questions/25544652/qt-widget-element-doesnt-want-to-hide
-        self.hide()
 
     def __setupScreenshotCount__():
         defaultScreenshotCount = 1
@@ -222,18 +212,9 @@ class SetupView(QtWidgets.QWidget):
     def __getGuideStrings__():
         guideStrings = []
         guideStrings.append("")
-        guideStrings.append("When starting a count down of TODO seconds will appear.")
-        guideStrings.append("Select the application you want to proceed before the countdown ends")
-        guideStrings.append("If you want to stop the process before it completes, press Cancel on this window")
+        # TODO unify with settings on top
+        guideStrings.append("After pressing start, with in 5 seconds, the user must ensure")
+        guideStrings.append("the application they wish to proceed and take screenshot is in focus.")
+        guideStrings.append("If you wish to stop the process before it completes, come back to")
+        guideStrings.append("this window and press Cancel.")
         return guideStrings
-
-# get view
-
-# /int box - number of screenshots
-# /delay between screenshot
-
-# /path selector to select where to save file
-# (not mvp) text box to specify filename
-# /key to proceed the application
-# /key to start selecting area
-# /add button to start / cancel

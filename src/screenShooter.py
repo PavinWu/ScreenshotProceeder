@@ -23,8 +23,6 @@ class ScreenShooter(QtWidgets.QWidget):
         scTool = 'gnome-screenshot'
 
         if platform.system() == "Linux":
-            print("Linux detected. Note: require '{}' to work.".format(scTool))
-
             try:
                 subprocess.run([scTool, '-f', picPath])
             except subprocess.CalledProcessError:
@@ -34,6 +32,8 @@ class ScreenShooter(QtWidgets.QWidget):
                 pixmap = QtGui.QPixmap()
                 pixmap.load(picPath)
                 return pixmap
+        else:
+            raise NotImplementedError("Only support Linux (Fedora Gnome)")
         
         # TODO non-Wayland Linux and other platforms
         # else:
@@ -56,19 +56,38 @@ class ScreenShooter(QtWidgets.QWidget):
         croppedPixmap.save(picPath)
         return croppedPixmap
 
-    def getRepeatCroppedScreen(self, picPath, timeDelay, rect, key, totCount):
-        timeDelta = 0.5
+    def getRepeatCroppedScreen(self, appSelectWait_s, picPath, timeDelay_s, rect, key, totCount):
         self.doStopRepeatScreenshot = False
+
+        # App selection wait
+        print("Waiting for user to select application...")
+        self.__countDown__(appSelectWait_s)
+
+        # Proceed and take screenshots
         for count in range(totCount):
-            timeLeft = timeDelay
-            while timeLeft > 0 and not self.doStopRepeatScreenshot:
-                time.sleep(timeDelta)
-                print(timeLeft)
-                timeLeft -= timeDelta
+            if count > 0 and not self.doStopRepeatScreenshot:
+                self.keyActuator.proceed(key)
+            print("Waiting to take screenshot {}".format(count))
+            self.__countDown__(timeDelay_s)
+            print("Taking screenshot {}".format(count))
+            
             if not self.doStopRepeatScreenshot:
                 self.getCroppedScreen(os.path.join(picPath, "{}.jpg".format(count)), rect)
-                self.keyActuator.proceed(key)
 
     def stopRepeatCroppedScreen(self):
         # Note: NOT thread safe. Assume this is the only function setting stopRepeatScreenshot to true.
         self.doStopRepeatScreenshot = True
+        print("Stop taking screenshots")
+
+    def isStopRepeatScreenshot(self):
+        return self.doStopRepeatScreenshot
+
+    def __countDown__(self, totalDur_s):
+        timeDelta = 0.5
+        timeLeft = totalDur_s
+        print("Time left (s): ", end = "")
+        while timeLeft > 0 and not self.doStopRepeatScreenshot:
+            time.sleep(timeDelta)
+            timeLeft -= timeDelta
+            
+            print("{}".format(timeLeft))    

@@ -1,5 +1,6 @@
 from enum import Enum
 from PySide6.QtCore import QPoint, Signal, QObject
+import os
 
 class ProceederKey(Enum):
     NONE  = 0,
@@ -35,6 +36,12 @@ class Settings():
         ]
 
         return '\n'.join(settingsStrList)
+
+    def isValid(self):
+        return self.count > 0 and self.delay_s >= 0 and \
+            self.beginCoords.x() < self.endCoords.x() and \
+            self.beginCoords.y() < self.endCoords.y() and \
+            os.path.isdir(self.folder)
 
 class Boundary():
     begin = QPoint()

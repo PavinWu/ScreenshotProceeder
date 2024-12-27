@@ -11,9 +11,10 @@
 
 from evdev import UInput, ecodes as e   
 # need python3-evdev
-# need: sudo usermod -a -G input $USER to get details about devices
+# need: sudo usermod -a -G input $USER to get details about devices (though not needed by this application)
 
 from proceederTypes import ProceederKey
+import platform
 
 class KeyActuator:
     def __init__(self):
@@ -37,10 +38,13 @@ class KeyActuator:
                 return None
 
     def proceed(self, proceederKey):
-        evKeyId = self.keyToEvdevId(proceederKey)
-        if evKeyId is not None:
-            ui = UInput()
-            ui.write(e.EV_KEY, evKeyId, 1)  # Press
-            ui.write(e.EV_KEY, evKeyId, 0)  # Release
-            ui.syn()
-            ui.close()
+        if platform.system() == "Linux":
+            evKeyId = self.keyToEvdevId(proceederKey)
+            if evKeyId is not None:
+                ui = UInput()
+                ui.write(e.EV_KEY, evKeyId, 1)  # Press
+                ui.write(e.EV_KEY, evKeyId, 0)  # Release
+                ui.syn()
+                ui.close()
+        else:
+            raise NotImplementedError("Only support Linux (Fedora Gnome)")
