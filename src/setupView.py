@@ -3,6 +3,8 @@ from areaSelector import AreaSelector
 from screenShooter import ScreenShooter
 from keyActuator import KeyActuator
 from proceederTypes import *
+
+from pathlib import Path
 import time
 
 QPoint = QtCore.QPoint
@@ -125,7 +127,7 @@ class SetupView(QtWidgets.QWidget):
     def __selectScreenshotFolder__(self):
         self.selectedFolder = QtWidgets.QFileDialog.getExistingDirectory(self, 
                                        "Open Directory",
-                                       "~/", # Wont work on Windows.
+                                       str(Path.home()),
                                        QtWidgets.QFileDialog.ShowDirsOnly
                                     |  QtWidgets.QFileDialog.DontResolveSymlinks)
         self.selectedFolderLabel.setText(str(self.selectedFolder))
