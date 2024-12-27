@@ -13,7 +13,7 @@ You are on your own for any act of piracy!
 - Linux with the following:
     - gnome-screenshot 
     - Python 3.12
-- Python libraries:
+- Python libraries (captured in src/requirements.txt):
     - PySide6
     - python3-evdev
 
