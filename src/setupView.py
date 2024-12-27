@@ -126,21 +126,17 @@ class SetupView(QtWidgets.QWidget):
     @QtCore.Slot()
     def __start__(self):
         self.__setWidgetEnableStateForCancel__()
-        # QtCore.QMetaObject.invokeMethod(self, "__startAction__", QtCore.Qt.QueuedConnection)
+        self.showMinimized()
 
-        # TODO minimise main window (NOT hide! - want user to be able to cancel)
-        # TODO not allow start until all OK (including box)
         singletonShooter = SingletonShooterForQThread()
         singletonShooter.setup(self.getSettings(), self.boundary, self.screenShooter, self.__cancel__)
         QtCore.QThreadPool.globalInstance().start(singletonShooter)
 
-        # TODO done event
-
     @QtCore.Slot()
     def __cancel__(self):
         self.__setWidgetEnableStateForSetup__()
-        # TODO maximise
         self.screenShooter.stopRepeatCroppedScreen()
+        self.showNormal()   # TODO cannot restore
 
     @QtCore.Slot()
     def __selectArea__(self):

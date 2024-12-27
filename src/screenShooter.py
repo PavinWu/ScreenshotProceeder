@@ -51,9 +51,10 @@ class ScreenShooter(QtWidgets.QWidget):
         return self.getWholeScreen("/tmp/screenshot_proceeder_screenbg.jpg")
 
     def getCroppedScreen(self, picPath, rect):
-        pixmap = self.getWholeScreen(picPath)
-        # TODO this doent save the new cropped version
-        return pixmap.copy(rect)
+        pixmap = self.getTempWholeScreen()
+        croppedPixmap = pixmap.copy(rect)
+        croppedPixmap.save(picPath)
+        return croppedPixmap
 
     def getRepeatCroppedScreen(self, picPath, timeDelay, rect, key, totCount):
         timeDelta = 0.5
