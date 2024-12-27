@@ -51,6 +51,8 @@ class SetupView(QtWidgets.QWidget):
         settings.delay_s = self.screenshotDelay_s.value()
         settings.proceederKey = self.proceederKeyComboBox.currentData()
         settings.folder = self.selectedFolderLabel.text()
+
+        return settings
         
         # TODO validation
 
@@ -122,6 +124,7 @@ class SetupView(QtWidgets.QWidget):
     @QtCore.Slot()
     def __start__(self):
         self.__setWidgetEnableStateForCancel__()
+        # QtCore.QMetaObject.invokeMethod(self, "__startAction__", QtCore.Qt.QueuedConnection)
 
         # TODO minimise main window (NOT hide! - want user to be able to cancel)
         # TODO not allow start until all OK (including box)
@@ -134,6 +137,7 @@ class SetupView(QtWidgets.QWidget):
     @QtCore.Slot()
     def __cancel__(self):
         self.__setWidgetEnableStateForSetup__()
+        # TODO maximise
         self.screenShooter.stopRepeatCroppedScreen()
 
     @QtCore.Slot()
@@ -141,7 +145,7 @@ class SetupView(QtWidgets.QWidget):
         self.__hideMainWindow__()
 
         # Defer execution until the Qt thread gets to update things in its update queue (after return of function).
-        # Otherwise the function called will be executed first.
+        # Otherwise the function called will be executed first, and GUI won't be updated at the right time.
         ## obj, name of slot, connection type
         QtCore.QMetaObject.invokeMethod(self, "__callSelectCoords__", QtCore.Qt.QueuedConnection)
 
@@ -156,6 +160,10 @@ class SetupView(QtWidgets.QWidget):
     def __callSelectCoords__(self):
         time.sleep(0.5)     # Allow time for animation to complete
         self.areaSelector.selectCoords(self.__getSelectArea__)
+
+    # @QtCore.Slot()
+    # def __startAction__(self):
+    #     self.screenShooter.getRepeatCroppedScreen()
 
     @QtCore.Slot(Boundary)
     def __getSelectArea__(self, boundary):

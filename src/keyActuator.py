@@ -13,7 +13,7 @@ from evdev import UInput, ecodes as e
 # need python3-evdev
 # need: sudo usermod -a -G input $USER to get details about devices
 
-import proceederTypes
+from proceederTypes import ProceederKey
 
 class KeyActuator:
     def __init__(self):
@@ -36,7 +36,7 @@ class KeyActuator:
             case _:
                 return None
 
-    def proceed(proceederKey):
+    def proceed(self, proceederKey):
         evKeyId = self.keyToEvdevId(proceederKey)
         if evKeyId is not None:
             ui = UInput()
