@@ -14,6 +14,7 @@ class ProceederKey(Enum):
 class Settings():
     def __init__(self):
         self.count = 0
+        self.startNum = 0
         self.delay_s = 0
         self.proceederKey = ProceederKey.NONE
 
@@ -25,6 +26,7 @@ class Settings():
     def __str__(self):
         settingsStrList = [
             "count: {}".format(self.count),
+            "start num: {}".format(self.startNum),
             "delay (s): {}".format(self.delay_s),
             "proceederKey: {}".format(self.proceederKey.name),
             "Coords: ({}, {}) to ({}, {})".format(

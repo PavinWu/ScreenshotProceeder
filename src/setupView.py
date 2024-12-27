@@ -21,17 +21,8 @@ class SingletonShooterForQThread(QtCore.QRunnable):
         self.applicationSelectWait_s = applicationSelectWait_s
 
     def run(self):
-        if (self.settings is not None) and (self.settings.isValid()) \
-            and (self.screenshooter is not None):
-
-            self.screenshooter.getRepeatCroppedScreen(
-                self.applicationSelectWait_s,
-                self.settings.folder,
-                self.settings.delay_s, 
-                QtCore.QRect(self.settings.beginCoords, self.settings.endCoords),
-                self.settings.proceederKey, 
-                self.settings.count
-            )
+        if (self.settings is not None) and (self.settings.isValid()) and (self.screenshooter is not None):
+            self.screenshooter.getRepeatCroppedScreen(self.applicationSelectWait_s, self.settings)
         else:
             print("Settings invalid. Aborting ...")
         
@@ -62,6 +53,7 @@ class SetupView(QtWidgets.QWidget):
     def getSettings(self):
         settings = Settings()
         settings.count = self.screenshotCount.value()
+        settings.startNum = self.screenshotStartNum.value()
         settings.delay_s = self.screenshotDelay_s.value()
         settings.proceederKey = self.proceederKeyComboBox.currentData()
         settings.folder = self.selectedFolderLabel.text()
@@ -73,6 +65,8 @@ class SetupView(QtWidgets.QWidget):
     def __defineWidgets__(self):
         self.screenshotCountLabel = "Number of screenshots: "
         self.screenshotCount = SetupView.__setupScreenshotCount__()
+        self.screenshotStartNumLabel = "First screenshot file number: "
+        self.screenshotStartNum = SetupView.__setupScreenshotStartNum__()
         self.screenshotDelayLabel = "Delay (s): "
         self.screenshotDelay_s = SetupView.__setupScreenshotDelay__()
         self.selectProceederLabel = "Proceeder Key: "
@@ -103,6 +97,7 @@ class SetupView(QtWidgets.QWidget):
         self.mainLayout.addLayout(self.bottomLayout)
 
         self.topLayout.addRow(self.screenshotCountLabel, self.screenshotCount)
+        self.topLayout.addRow(self.screenshotStartNumLabel, self.screenshotStartNum)
         self.topLayout.addRow(self.screenshotDelayLabel, self.screenshotDelay_s)
         self.topLayout.addRow(self.selectProceederLabel, self.proceederKeyComboBox)
         
@@ -119,6 +114,7 @@ class SetupView(QtWidgets.QWidget):
         # Set widget states
         self.cancelButton.setEnabled(False)  # disable until in progress
         self.setupWidgetList.append(self.screenshotCount)
+        self.setupWidgetList.append(self.screenshotStartNum)
         self.setupWidgetList.append(self.screenshotDelay_s)
         self.setupWidgetList.append(self.proceederKeyComboBox)
         self.setupWidgetList.append(self.selectAreaButton)
@@ -200,7 +196,16 @@ class SetupView(QtWidgets.QWidget):
         screenshotCount = QtWidgets.QSpinBox()
         screenshotCount.setValue(defaultScreenshotCount)
         screenshotCount.setMinimum(1)
+        screenshotCount.setMaximum(9999)
         return screenshotCount
+
+    def __setupScreenshotStartNum__():
+        defaultStartNum = 0
+        screenshotStartNum = QtWidgets.QSpinBox()
+        screenshotStartNum.setValue(defaultStartNum)
+        screenshotStartNum.setMinimum(0)
+        screenshotStartNum.setMaximum(9998)
+        return screenshotStartNum
 
     def __setupScreenshotDelay__():
         defaultScreenshotDelay_s = 5

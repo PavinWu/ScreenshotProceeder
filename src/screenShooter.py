@@ -56,8 +56,17 @@ class ScreenShooter(QtWidgets.QWidget):
         croppedPixmap.save(picPath)
         return croppedPixmap
 
-    def getRepeatCroppedScreen(self, appSelectWait_s, picPath, timeDelay_s, rect, key, totCount):
+    def getRepeatCroppedScreen(self, appSelectWait_s, settings):
         self.doStopRepeatScreenshot = False
+
+        # TODO check settings type?
+
+        picPath = settings.folder
+        timeDelay_s = settings.delay_s
+        rect = QtCore.QRect(settings.beginCoords, settings.endCoords)
+        key = settings.proceederKey
+        totCount = settings.count
+        startNum = settings.startNum
 
         # App selection wait
         print("Waiting for user to select application...")
@@ -67,12 +76,13 @@ class ScreenShooter(QtWidgets.QWidget):
         for count in range(totCount):
             if count > 0 and not self.doStopRepeatScreenshot:
                 self.keyActuator.proceed(key)
-            print("Waiting to take screenshot {}".format(count))
+            currentNum = count+startNum
+            print("Waiting to take screenshot {}".format(currentNum))
             self.__countDown__(timeDelay_s)
-            print("Taking screenshot {}".format(count))
+            print("Taking screenshot {}".format(currentNum))
             
             if not self.doStopRepeatScreenshot:
-                self.getCroppedScreen(os.path.join(picPath, "{}.jpg".format(count)), rect)
+                self.getCroppedScreen(os.path.join(picPath, "{}.jpg".format(currentNum)), rect)
 
     def stopRepeatCroppedScreen(self):
         # Note: NOT thread safe. Assume this is the only function setting stopRepeatScreenshot to true.
@@ -89,5 +99,5 @@ class ScreenShooter(QtWidgets.QWidget):
         while timeLeft > 0 and not self.doStopRepeatScreenshot:
             time.sleep(timeDelta)
             timeLeft -= timeDelta
-            
+
             print("{}".format(timeLeft))    
