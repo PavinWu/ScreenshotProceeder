@@ -11,10 +11,11 @@ class SingletonShooterForQThread(QtCore.QRunnable):
     def __init__(self):
         super().__init__()
 
-    def setup(self, settings, boundary, shooter):
+    def setup(self, settings, boundary, shooter, doneCallback):
         self.settings = settings
         self.boundary = boundary
         self.screenshooter = shooter
+        self.doneCallback = doneCallback
 
     def run(self):
         if (self.settings is not None) and (self.screenshooter is not None):
@@ -25,6 +26,7 @@ class SingletonShooterForQThread(QtCore.QRunnable):
                 self.settings.proceederKey, 
                 self.settings.count
             )
+            self.doneCallback()
 
 class SetupView(QtWidgets.QWidget):
     def __init__(self):
@@ -129,7 +131,7 @@ class SetupView(QtWidgets.QWidget):
         # TODO minimise main window (NOT hide! - want user to be able to cancel)
         # TODO not allow start until all OK (including box)
         singletonShooter = SingletonShooterForQThread()
-        singletonShooter.setup(self.getSettings(), self.boundary, self.screenShooter)
+        singletonShooter.setup(self.getSettings(), self.boundary, self.screenShooter, self.__cancel__)
         QtCore.QThreadPool.globalInstance().start(singletonShooter)
 
         # TODO done event
