@@ -13,12 +13,12 @@ class SingletonShooterForQThread(QtCore.QRunnable):
     def __init__(self):
         super().__init__()
 
-    def setup(self, settings, boundary, shooter, doneCallback):
+    def setup(self, applicationSelectWait_s, settings, boundary, shooter, doneCallback):
         self.settings = settings
         self.boundary = boundary
         self.screenshooter = shooter
         self.doneCallback = doneCallback
-        self.applicationSelectWait_s = 5
+        self.applicationSelectWait_s = applicationSelectWait_s
 
     def run(self):
         if (self.settings is not None) and (self.settings.isValid()) \
@@ -38,6 +38,9 @@ class SingletonShooterForQThread(QtCore.QRunnable):
         self.doneCallback()
 
 class SetupView(QtWidgets.QWidget):
+
+    applicationSelectWait_s = 5
+
     def __init__(self):
         super().__init__()
 
@@ -138,14 +141,17 @@ class SetupView(QtWidgets.QWidget):
         self.showMinimized()
 
         singletonShooter = SingletonShooterForQThread()
-        singletonShooter.setup(self.getSettings(), self.boundary, self.screenShooter, self.__cancel__)
+        singletonShooter.setup(SetupView.applicationSelectWait_s, self.getSettings(), self.boundary, self.screenShooter, self.__cancel__)
         QtCore.QThreadPool.globalInstance().start(singletonShooter)
 
     @QtCore.Slot()
     def __cancel__(self):
         self.__setWidgetEnableStateForSetup__()
         self.screenShooter.stopRepeatCroppedScreen()
-        self.showNormal()   # TODO cannot restore
+        
+        # Need to hide then show for the window to be restored ..
+        self.hide()
+        self.showNormal()
 
     @QtCore.Slot()
     def __selectArea__(self):
@@ -214,8 +220,7 @@ class SetupView(QtWidgets.QWidget):
     def __getGuideStrings__():
         guideStrings = []
         guideStrings.append("")
-        # TODO unify with settings on top
-        guideStrings.append("After pressing start, with in 5 seconds, the user must ensure")
+        guideStrings.append("After pressing start, with in {} seconds, the user must ensure".format(SetupView.applicationSelectWait_s))
         guideStrings.append("the application they wish to proceed and take screenshot is in focus.")
         guideStrings.append("If you wish to stop the process before it completes, come back to")
         guideStrings.append("this window and press Cancel.")
