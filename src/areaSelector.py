@@ -59,11 +59,9 @@ class AreaSelector(QtWidgets.QWidget):
         self.commBoundary.signal.emit(boundary)
 
         # Disconnect. See https://doc.qt.io/qt-6/signalsandslots.html
-        # TODO try catch somehow?
         self.commBoundary.signal.disconnect()
 
     def selectCoords(self, getCoordsCallback):
-        # Can do this!: https://stackoverflow.com/questions/37252756/simplest-way-for-pyqt-threading
         # https://doc.qt.io/qtforpython-6/tutorials/basictutorial/signals_and_slots.html#signals-and-slots
         # Note: in all these cases, the signal is NOT the signal object. It's created inside a QObject, and use the name in there.
         pixmap = self.screenShooter.getTempWholeScreen()

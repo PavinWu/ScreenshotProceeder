@@ -13,13 +13,6 @@ class ScreenShooter(QtWidgets.QWidget):
     def getWholeScreen(self, picPath):
         # Note: The Qt's screen grabber doesn't work on Wayland. Assume Linux is using Wayland.
         # https://bugreports.qt.io/browse/QTBUG-34976?focusedCommentId=276038&page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel
-        # 
-        # Use gnome-screenshot instead.
-        # 27 Dec 24 - gnome screenshot sometimes does run ...
-        #   Made us think there's something wrong with how things are executed ...
-        # Later: gnome-screenshot sometimes doesn't work with QtCore.QProcess for whatever reason ...
-        # Use python subprocess instead: https://stackoverflow.com/questions/89228/how-do-i-execute-a-program-or-call-a-system-command
-
         scTool = 'gnome-screenshot'
 
         if platform.system() == "Linux":
@@ -34,16 +27,6 @@ class ScreenShooter(QtWidgets.QWidget):
                 return pixmap
         else:
             raise NotImplementedError("Only support Linux (Fedora Gnome)")
-        
-        # TODO non-Wayland Linux and other platforms
-        # else:
-        #     screen = QtGui.QGuiApplication.primaryScreen()
-        #     window = self.windowHandle()  
-        #     if window:
-        #         screen = window.screen()
-        #     if not screen:
-        #         raise RuntimeError("Nope")  # TODO
-        #     pixmap = screen.grabWindow(0)
 
         return pixmap
 
@@ -58,8 +41,6 @@ class ScreenShooter(QtWidgets.QWidget):
 
     def getRepeatCroppedScreen(self, appSelectWait_s, settings):
         self.doStopRepeatScreenshot = False
-
-        # TODO check settings type?
 
         picPath = settings.folder
         timeDelay_s = settings.delay_s

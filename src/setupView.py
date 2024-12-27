@@ -48,8 +48,6 @@ class SetupView(QtWidgets.QWidget):
         self.__setupConnections__()
         self.__setupLayouts__()
 
-        # TODO restrict size
-
     def getSettings(self):
         settings = Settings()
         settings.count = self.screenshotCount.value()
@@ -155,15 +153,7 @@ class SetupView(QtWidgets.QWidget):
 
         # Defer execution until the Qt thread gets to update things in its update queue (after return of function).
         # Otherwise the function called will be executed first, and GUI won't be updated at the right time.
-        ## obj, name of slot, connection type
         QtCore.QMetaObject.invokeMethod(self, "__callSelectCoords__", QtCore.Qt.QueuedConnection)
-
-        # No error, but not hide
-        # QtCore.QMetaObject.invokeMethod(self, "__callSelectCoords__", QtCore.Qt.AutoConnection)
-        
-        # Not work
-        ## QtCore.QMetaObject.invokeMethod(self, areaSelector.selectCoords, self.__getSelectArea__)
-        ## QtCore.QMetaObject.invokeMethod(self.areaSelector, selectCoords, self.__getSelectArea__)
 
     @QtCore.Slot()
     def __callSelectCoords__(self):
