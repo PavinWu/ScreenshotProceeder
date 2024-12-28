@@ -13,11 +13,11 @@ class SingletonShooterForQThread(QtCore.QRunnable):
     def __init__(self):
         super().__init__()
 
-    def setup(self, applicationSelectWait_s, settings, boundary, shooter, doneCallback):
+    def setup(self, applicationSelectWait_s, settings, boundary, shooter, completionCallback):
         self.settings = settings
         self.boundary = boundary
         self.screenshooter = shooter
-        self.doneCallback = doneCallback
+        self.completionCallback = completionCallback
         self.applicationSelectWait_s = applicationSelectWait_s
 
     def run(self):
@@ -26,9 +26,11 @@ class SingletonShooterForQThread(QtCore.QRunnable):
         else:
             print("Settings invalid. Aborting ...")
         
-        self.doneCallback()
+        self.completionCallback()
 
 class SetupView(QtWidgets.QWidget):
+
+    # TODO convert to PDF option
 
     applicationSelectWait_s = 5
 
@@ -63,6 +65,8 @@ class SetupView(QtWidgets.QWidget):
         return settings
 
     def __defineWidgets__(self):
+
+        self.titleScreenshotLabel = SetupView.__setupTitle__("Taking Screenshots")
         self.screenshotCountLabel = "Number of screenshots: "
         self.screenshotCount = SetupView.__setupScreenshotCount__()
         self.screenshotStartNumLabel = "First screenshot file number: "
@@ -77,11 +81,11 @@ class SetupView(QtWidgets.QWidget):
 
         self.selectFolderButton = QtWidgets.QPushButton("Select Screenshot Folder")
         self.selectedFolderLabel = QtWidgets.QLabel("")  # TODO wrap to fit
-
-        guideStrings = SetupView.__getGuideStrings__()
-        self.guideLabels = [QtWidgets.QLabel(st) for st in guideStrings]
+        self.guideLabel = QtWidgets.QLabel(SetupView.__getGuideString__())
         self.startButton = QtWidgets.QPushButton("Start")
         self.cancelButton = QtWidgets.QPushButton("Cancel")
+
+        self.combineScreenshotLabel = SetupView.__setupTitle__("________<br/><br/>Combine Screenshots")
 
     def __setupConnections__(self):
         self.selectFolderButton.clicked.connect(self.__selectScreenshotFolder__)
@@ -93,8 +97,10 @@ class SetupView(QtWidgets.QWidget):
         self.mainLayout = QtWidgets.QVBoxLayout(self)
         self.topLayout = QtWidgets.QFormLayout()
         self.bottomLayout = QtWidgets.QGridLayout()
+        self.mainLayout.addWidget(self.titleScreenshotLabel)
         self.mainLayout.addLayout(self.topLayout)
         self.mainLayout.addLayout(self.bottomLayout)
+        self.mainLayout.addWidget(self.combineScreenshotLabel)
 
         self.topLayout.addRow(self.screenshotCountLabel, self.screenshotCount)
         self.topLayout.addRow(self.screenshotStartNumLabel, self.screenshotStartNum)
@@ -105,11 +111,10 @@ class SetupView(QtWidgets.QWidget):
         self.bottomLayout.addWidget(self.selectedFolderLabel, 0, 1)
         self.bottomLayout.addWidget(self.selectAreaButton, 1, 0)
         self.bottomLayout.addWidget(self.selectedAreaLabel, 1, 1)
-        for id, label in enumerate(self.guideLabels):
-            # TODO Centre alignment
-            self.bottomLayout.addWidget(label, id+2, 0, 1, -1)
-        self.bottomLayout.addWidget(self.startButton, len(self.guideLabels)+3, 0)
-        self.bottomLayout.addWidget(self.cancelButton, len(self.guideLabels)+3, 1)
+        self.bottomLayout.addWidget(self.guideLabel, 2, 0, 1, -1)
+        self.bottomLayout.addWidget(self.startButton, 3, 0)
+        self.bottomLayout.addWidget(self.cancelButton, 3, 1)
+
 
         # Set widget states
         self.cancelButton.setEnabled(False)  # disable until in progress
@@ -190,6 +195,12 @@ class SetupView(QtWidgets.QWidget):
         for widget in self.cancelWidgetList:
             widget.setEnabled(True)
 
+    def __setupTitle__(title):
+        titleLabel = QtWidgets.QLabel("<b>{}</b>".format(title))
+        titleLabel.setAlignment(QtCore.Qt.AlignCenter)
+
+        return titleLabel
+
     def __setupScreenshotCount__():
         defaultScreenshotCount = 1
 
@@ -222,11 +233,10 @@ class SetupView(QtWidgets.QWidget):
             proceederKeyComboBox.addItem(k.name, k)
         return proceederKeyComboBox
 
-    def __getGuideStrings__():
-        guideStrings = []
-        guideStrings.append("")
-        guideStrings.append("After pressing start, with in {} seconds, the user must ensure".format(SetupView.applicationSelectWait_s))
-        guideStrings.append("the application they wish to proceed and take screenshot is in focus.")
-        guideStrings.append("If you wish to stop the process before it completes, come back to")
-        guideStrings.append("this window and press Cancel.")
-        return guideStrings
+    def __getGuideString__():
+        guideString = "<br/>After pressing start, with in {} seconds, the user must ensure".format(SetupView.applicationSelectWait_s)
+        guideString += "<br/>the application they wish to proceed and take screenshot is in focus."
+        guideString += "<br/>If you wish to stop the process before it completes, come back to"
+        guideString += "<br/>this window and press Cancel."
+
+        return guideString
