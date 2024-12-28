@@ -10,9 +10,10 @@ You are on your own for any act of piracy!
 <br>Also, the tool has only been tested on Fedora Silverblue 41. As this was created for personal use, there is no plan to update it for any other systems.
  
 ## Pre-requisites:
-- Linux with the following:
+- Linux system with the following:
     - gnome-screenshot 
     - Python 3.12
+    - (optional) ImageMagick - only required if using conversion to pdf at the end.
 - Python libraries:
     - PySide6
     - python3-evdev
