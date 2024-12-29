@@ -9,7 +9,6 @@ class AreaSelector(QtWidgets.QWidget):
     def __init__(self, screenShooter):
         super().__init__()
 
-        # Note that begin coords may be less or greater than end.
         self.beginCoords = None
         self.endCoords = None
         self.screenShooter = screenShooter
@@ -24,7 +23,6 @@ class AreaSelector(QtWidgets.QWidget):
 
     def mousePressEvent(self, event):
         self.beginCoords = event.pos()
-        # TODO normalize coords here?
         print("Drawing begin coord at {}, {}", self.beginCoords.x, self.beginCoords.y)
         self.rubberBand = QtWidgets.QRubberBand(QtWidgets.QRubberBand.Rectangle, self)
         self.rubberBand.setGeometry(QRect(self.beginCoords, QtCore.QSize()))
