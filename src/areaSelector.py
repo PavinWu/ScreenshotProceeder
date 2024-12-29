@@ -23,7 +23,6 @@ class AreaSelector(QtWidgets.QWidget):
 
     def mousePressEvent(self, event):
         self.beginCoords = event.pos()
-        # TODO normalize coords here?
         print("Drawing begin coord at {}, {}", self.beginCoords.x, self.beginCoords.y)
         self.rubberBand = QtWidgets.QRubberBand(QtWidgets.QRubberBand.Rectangle, self)
         self.rubberBand.setGeometry(QRect(self.beginCoords, QtCore.QSize()))

@@ -31,8 +31,6 @@ class SingletonShooterForQThread(QtCore.QRunnable):
 
 class SetupView(QtWidgets.QWidget):
 
-    # TODO convert to PDF option
-
     applicationSelectWait_s = 5
 
     def __init__(self):
