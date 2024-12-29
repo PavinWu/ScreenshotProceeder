@@ -3,6 +3,7 @@ from areaSelector import AreaSelector
 from screenShooter import ScreenShooter
 from keyActuator import KeyActuator
 from proceederTypes import *
+from combiner import Combiner
 
 from pathlib import Path
 import time
@@ -86,12 +87,14 @@ class SetupView(QtWidgets.QWidget):
         self.cancelButton = QtWidgets.QPushButton("Cancel")
 
         self.combineScreenshotLabel = SetupView.__setupTitle__("________<br/><br/>Combine Screenshots")
+        self.combineScreenshotButton = QtWidgets.QPushButton("Combine to outfile.pdf")
 
     def __setupConnections__(self):
         self.selectFolderButton.clicked.connect(self.__selectScreenshotFolder__)
         self.selectAreaButton.clicked.connect(self.__selectArea__)
         self.startButton.clicked.connect(self.__start__)
         self.cancelButton.clicked.connect(self.__cancel__)
+        self.combineScreenshotButton.clicked.connect(self.__combine__)
 
     def __setupLayouts__(self):
         self.mainLayout = QtWidgets.QVBoxLayout(self)
@@ -100,7 +103,6 @@ class SetupView(QtWidgets.QWidget):
         self.mainLayout.addWidget(self.titleScreenshotLabel)
         self.mainLayout.addLayout(self.topLayout)
         self.mainLayout.addLayout(self.bottomLayout)
-        self.mainLayout.addWidget(self.combineScreenshotLabel)
 
         self.topLayout.addRow(self.screenshotCountLabel, self.screenshotCount)
         self.topLayout.addRow(self.screenshotStartNumLabel, self.screenshotStartNum)
@@ -115,6 +117,8 @@ class SetupView(QtWidgets.QWidget):
         self.bottomLayout.addWidget(self.startButton, 3, 0)
         self.bottomLayout.addWidget(self.cancelButton, 3, 1)
 
+        self.mainLayout.addWidget(self.combineScreenshotLabel)
+        self.mainLayout.addWidget(self.combineScreenshotButton)
 
         # Set widget states
         self.cancelButton.setEnabled(False)  # disable until in progress
@@ -153,6 +157,11 @@ class SetupView(QtWidgets.QWidget):
         # Need to hide then show for the window to be restored ..
         self.hide()
         self.showNormal()
+
+    @QtCore.Slot()
+    def __combine__(self):
+        combiner = Combiner()
+        combiner.run(20, self.getSettings().folder)
 
     @QtCore.Slot()
     def __selectArea__(self):
@@ -234,9 +243,9 @@ class SetupView(QtWidgets.QWidget):
         return proceederKeyComboBox
 
     def __getGuideString__():
-        guideString = "<br/>After pressing start, with in {} seconds, the user must ensure".format(SetupView.applicationSelectWait_s)
-        guideString += "<br/>the application they wish to proceed and take screenshot is in focus."
-        guideString += "<br/>If you wish to stop the process before it completes, come back to"
+        guideString = "<br/>After pressing start, with in {} seconds, the user must".format(SetupView.applicationSelectWait_s)
+        guideString += "<br/>ensure the application they wish to proceed is in focus."
+        guideString += "<br/>If you wish to stop taking screenshots, come back to"
         guideString += "<br/>this window and press Cancel."
 
         return guideString

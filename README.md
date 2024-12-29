@@ -13,7 +13,7 @@ You are on your own for any act of piracy!
 - Linux system with the following:
     - gnome-screenshot 
     - Python 3.12
-    - (optional) ImageMagick - only required if using conversion to pdf at the end.
+    - (optional) ImageMagick - only required if using conversion to pdf.
 - Python libraries:
     - PySide6
     - python3-evdev
@@ -36,8 +36,8 @@ The application has been tested on Fedora Silverblue 41, running on Wayland.
 - Number of screenshots
 - First screenshot file number
     - Each screenshot will be saved as `[number].jpg`. By default, the first screenshot is named `0.jpg`. 
-    - Subsequent screenshot number will increment from the start e.g. by default the second is `1.jpg`, the third is `2.jpg`, and so on.
-    - This option allows you to change the first screenshot number to the specified number.
+    - Subsequent screenshot number will increment from the start e.g., by default the second is `1.jpg`, the third is `2.jpg`, and so on.
+    - This option allows you to change the first screenshot name to the specified number.
     <br>Useful if you have taken a bunch of screenshots and want to go back and fix somethings.
 - Delay
     - The delay time between the key input and taking the screenshot.
@@ -51,4 +51,4 @@ The application has been tested on Fedora Silverblue 41, running on Wayland.
     - Once this button is clicked, a temporary screenshot will be displayed and an area will be selectable. The user should select the desired area they want to capture.
 
 ## TODOs
-- Could still use some improvements. See the code for more.
+- Could still use some improvements. See working_branch for more.

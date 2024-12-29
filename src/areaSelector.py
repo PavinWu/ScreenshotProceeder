@@ -9,7 +9,6 @@ class AreaSelector(QtWidgets.QWidget):
     def __init__(self, screenShooter):
         super().__init__()
 
-        # Note that begin coords may be less or greater than end.
         self.beginCoords = None
         self.endCoords = None
         self.screenShooter = screenShooter
